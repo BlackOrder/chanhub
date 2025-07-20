@@ -5,16 +5,16 @@ import (
 	"sync"
 )
 
-func New() *hub {
-	return &hub{subs: make(map[chan struct{}]struct{})}
+func New() *Hub {
+	return &Hub{subs: make(map[chan struct{}]struct{})}
 }
 
-type hub struct {
+type Hub struct {
 	mu   sync.RWMutex
 	subs map[chan struct{}]struct{}
 }
 
-func (h *hub) Subscribe(ctx context.Context) <-chan struct{} {
+func (h *Hub) Subscribe(ctx context.Context) <-chan struct{} {
 	ch := make(chan struct{}, 1)
 	h.mu.Lock()
 	h.subs[ch] = struct{}{}
@@ -30,7 +30,7 @@ func (h *hub) Subscribe(ctx context.Context) <-chan struct{} {
 	return ch
 }
 
-func (h *hub) Broadcast() {
+func (h *Hub) Broadcast() {
 	h.mu.RLock()
 	for ch := range h.subs {
 		select {
